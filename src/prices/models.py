@@ -1,9 +1,9 @@
 from sqlalchemy.orm import Mapped, mapped_column
 
-from common import BaseFieldsMixin
+from common import Base, BaseFieldsMixin
 
 
-class PriceHistory(BaseFieldsMixin):
+class PriceHistory(Base, BaseFieldsMixin):
     __tablename__ = "price_history"
 
     asset_id: Mapped[str] = mapped_column(index=True)
