@@ -5,10 +5,11 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from database.session import get_db
+from prices.enums import CryptoAsset
 from prices.exceptions import BasePriceException
 from prices.models import PriceHistory
 from prices.schemas import PriceHistoryResponse, PriceResponse
-from prices.service import fetch_crypto_prices, save_prices_to_db
+from prices.service import fetch_crypto_prices
 
 router = APIRouter()
 
@@ -19,18 +20,18 @@ async def get_latest_prices(
         default=["bitcoin", "ethereum", "solana"],
         description="Список ID криптовалют (например, bitcoin, ethereum, solana).",
     ),
-    db: AsyncSession = Depends(get_db),
 ) -> PriceResponse:
     try:
         result = await fetch_crypto_prices(symbols)
     except BasePriceException as e:
         raise HTTPException(detail=e.message, status_code=e.status_code) from e
-    await save_prices_to_db(db, result)
     return PriceResponse(data=result)
 
 
 @router.get("/history/{asset_id}", response_model=list[PriceHistoryResponse])
-async def get_price_history(asset_id: str, db: AsyncSession = Depends(get_db)) -> Any:
+async def get_price_history(
+    asset_id: CryptoAsset, db: AsyncSession = Depends(get_db)
+) -> Any:
     result = await db.execute(
         select(PriceHistory)
         .where(PriceHistory.asset_id == asset_id)
