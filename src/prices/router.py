@@ -17,8 +17,8 @@ router = APIRouter()
 @router.get("/latest_prices", response_model=PriceResponse)
 async def get_latest_prices(
     symbols: list[str] = Query(
-        default=["bitcoin", "ethereum", "solana"],
-        description="Список ID криптовалют (например, bitcoin, ethereum, solana).",
+        default=["bitcoin", "ethereum", "tether", "binancecoin", "solana"],
+        description="Список ID криптовалют.",
     ),
 ) -> PriceResponse:
     try:
